@@ -1,65 +1,85 @@
-/*
-    Based on Neil Kolban example for IDF: https://github.com/nkolban/esp32-snippets/blob/master/cpp_utils/tests/BLE%20Tests/SampleWrite.cpp
-    Ported to Arduino ESP32 by Evandro Copercini
-*/
-
+#include <Arduino.h>
 #include <BLEDevice.h>
-#include <BLEUtils.h>
 #include <BLEServer.h>
+#include <BLEUtils.h>
+
+// BLE SECTION
+BLEServer *pServer = NULL;
+
+BLECharacteristic *message_characteristic = NULL;
 
 // See the following for generating UUIDs:
 // https://www.uuidgenerator.net/
 
-#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
-#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+#define SERVICE_UUID "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
 
+#define MESSAGE_CHARACTERISTIC_UUID "6d68efe5-04b6-4a85-abc4-c2670b7bf7fd"
 
-class MyCallbacks: public BLECharacteristicCallbacks {
-    void onWrite(BLECharacteristic *pCharacteristic) {
-      std::string value = pCharacteristic->getValue();
+class MyServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *pServer)
+  {
+    Serial.println("Connected");
+  };
 
-      if (value.length() > 0) {
-        Serial.println("*********");
-        Serial.print("New value: ");
-        for (int i = 0; i < value.length(); i++)
-          Serial.print(value[i]);
-
-        Serial.println();
-        Serial.println("*********");
-      }
-    }
+  void onDisconnect(BLEServer *pServer)
+  {
+    Serial.println("Disconnected");
+  }
 };
 
-void setup() {
+class CharacteristicsCallbacks : public BLECharacteristicCallbacks
+{
+  void onWrite(BLECharacteristic *pCharacteristic)
+  {
+    Serial.print("Value Written ");
+    Serial.println(pCharacteristic->getValue().c_str());
+
+  }
+};
+
+void setup()
+{
   Serial.begin(115200);
 
-  Serial.println("1- Download and install an BLE scanner app in your phone");
-  Serial.println("2- Scan for BLE devices in the app");
-  Serial.println("3- Connect to MyESP32");
-  Serial.println("4- Go to CUSTOM CHARACTERISTIC in CUSTOM SERVICE and write something");
-  Serial.println("5- See the magic =)");
-
-  BLEDevice::init("MyESP32");
-  BLEServer *pServer = BLEDevice::createServer();
-
+  // Create the BLE Device
+  BLEDevice::init("Yaratik");
+  // Create the BLE Server
+  pServer = BLEDevice::createServer();
+  pServer->setCallbacks(new MyServerCallbacks());
+  // Create the BLE Service
   BLEService *pService = pServer->createService(SERVICE_UUID);
+  delay(100);
 
-  BLECharacteristic *pCharacteristic = pService->createCharacteristic(
-                                         CHARACTERISTIC_UUID,
-                                         BLECharacteristic::PROPERTY_READ |
-                                         BLECharacteristic::PROPERTY_WRITE
-                                       );
+  // Create a BLE Characteristic
+  message_characteristic = pService->createCharacteristic(
+      MESSAGE_CHARACTERISTIC_UUID,
+      BLECharacteristic::PROPERTY_READ |
+          BLECharacteristic::PROPERTY_WRITE |
+          BLECharacteristic::PROPERTY_NOTIFY |
+          BLECharacteristic::PROPERTY_INDICATE);
 
-  pCharacteristic->setCallbacks(new MyCallbacks());
-
-  pCharacteristic->setValue("Hello World");
+  // Start the BLE service
   pService->start();
 
-  BLEAdvertising *pAdvertising = pServer->getAdvertising();
-  pAdvertising->start();
+  // Start advertising
+  pServer->getAdvertising()->start();
+
+  message_characteristic->setValue("Message one");
+  message_characteristic->setCallbacks(new CharacteristicsCallbacks());
+
+  Serial.println("Waiting for a client connection to notify...");
 }
 
-void loop() {
-  // put your main code here, to run repeatedly:
-  delay(2000);
+void loop()
+{
+  message_characteristic->setValue("Message one");
+  message_characteristic->notify();
+
+  delay(1000);
+
+  message_characteristic->setValue("Message Two");
+  message_characteristic->notify();
+
+  delay(1000);
 }
