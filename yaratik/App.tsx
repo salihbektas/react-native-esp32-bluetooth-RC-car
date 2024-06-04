@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Button, PermissionsAndroid, Platform, StyleSheet, Text, View } from 'react-native';
+import { Button, PermissionsAndroid, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { BleManager, Device } from 'react-native-ble-plx'
 import base64 from 'react-native-base64'
 
@@ -12,6 +12,37 @@ const manager = new BleManager()
 export default function App() {
   const [status, setStatus] = useState<Status>('Scanning')
   const [device, setDevice] = useState<Device | null>(null)
+
+  function sendCommand(param:string) {
+    let command:string;
+
+    switch(param){
+      case 'forward':
+        command = '1'
+        break;
+      case 'backward':
+        command = '2'
+        break;
+      case 'left':
+        command = '3'
+        break;
+      case 'right':
+        command = '4'
+        break;
+      default:
+        command = '0'
+        break;
+
+
+    }
+    if(device){
+      device.writeCharacteristicWithoutResponseForService(
+        "4fafc201-1fb5-459e-8fcc-c5c9c331914b",
+        "6d68efe5-04b6-4a85-abc4-c2670b7bf7fd",
+        base64.encode(command)
+      ).catch(error => console.log(error))
+    }
+  }
 
 
   const requestBluetoothPermission = async () => {
@@ -62,12 +93,12 @@ export default function App() {
         device.connect()
           .then(() => {
             setDevice(device)
-            return device.discoverAllServicesAndCharacteristics()
+            device.discoverAllServicesAndCharacteristics()
               .then(() => {setStatus('Connected');})
               .catch(error => console.log('Sevice discovery error: ', error))
           })
           .catch(() => {console.log('Not connected !!!')})
-        console.log('founded')
+        console.log('found')
         // Proceed with connection.
       }
     })
@@ -87,19 +118,24 @@ export default function App() {
       <StatusBar style="auto" />
       {status === 'Scanning' ? <Text>Scanning</Text> : 
        status === 'Connecting' ? <Text>Try to connect Yaratik</Text>:
-       status === 'Connected' ? <Text>Connected</Text>: 
+       status === 'Connected' ? 
+       <View>
+        <Pressable onPressIn={() => sendCommand('forward')} onPressOut={() => sendCommand('stop')} >
+          <Text style={styles.text}>Forward</Text>
+        </Pressable>
+        <Pressable onPressIn={() => sendCommand('left')} onPressOut={() => sendCommand('stop')} >
+          <Text style={styles.text}>Left</Text>
+        </Pressable>
+        <Pressable onPressIn={() => sendCommand('right')} onPressOut={() => sendCommand('stop')} >
+          <Text style={styles.text}>Right</Text>
+        </Pressable>
+        <Pressable onPressIn={() => sendCommand('backward')} onPressOut={() => sendCommand('stop')} >
+          <Text style={styles.text}>Backward</Text>
+        </Pressable>
+      </View>: 
        null
       }
-      <Button title='Send Data' onPress={() => {
-        if(device){
-          device.writeCharacteristicWithoutResponseForService(
-            "4fafc201-1fb5-459e-8fcc-c5c9c331914b",
-            "beb5483e-36e1-4688-b7f5-ea07361b26a8",
-            base64.encode('test')
-          ).catch(error => console.log(error))
-        }
-      }} />
-      
+
     </View>
   );
 }
@@ -111,4 +147,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+
+  text: {
+    padding: 10,
+    margin: 15,
+    borderRadius: 8,
+    backgroundColor: 'lightblue'
+  }
 });
