@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Button, PermissionsAndroid, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { BleManager, Device } from 'react-native-ble-plx'
 import base64 from 'react-native-base64'
+import ControllerPage from './ControllerPage'
 
 
 type Status = 'Scanning' | 'Connecting' | 'Connected'
@@ -119,20 +120,7 @@ export default function App() {
       {status === 'Scanning' ? <Text>Scanning</Text> : 
        status === 'Connecting' ? <Text>Try to connect Yaratik</Text>:
        status === 'Connected' ? 
-       <View>
-        <Pressable onPressIn={() => sendCommand('forward')} onPressOut={() => sendCommand('stop')} >
-          <Text style={styles.text}>Forward</Text>
-        </Pressable>
-        <Pressable onPressIn={() => sendCommand('left')} onPressOut={() => sendCommand('stop')} >
-          <Text style={styles.text}>Left</Text>
-        </Pressable>
-        <Pressable onPressIn={() => sendCommand('right')} onPressOut={() => sendCommand('stop')} >
-          <Text style={styles.text}>Right</Text>
-        </Pressable>
-        <Pressable onPressIn={() => sendCommand('backward')} onPressOut={() => sendCommand('stop')} >
-          <Text style={styles.text}>Backward</Text>
-        </Pressable>
-      </View>: 
+       <ControllerPage sendCommand={sendCommand} />: 
        null
       }
 
