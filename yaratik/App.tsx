@@ -118,10 +118,10 @@ export default function App() {
     <View style={styles.container}>
       <StatusBar style="auto" />
       {status === 'Scanning' ? <Text>Scanning</Text> : 
-       status === 'Connecting' ? <Text>Try to connect Yaratik</Text>:
-       status === 'Connected' ? 
-       <ControllerPage sendCommand={sendCommand} />: 
-       null
+      status === 'Connecting' ? <Text>Try to connect Yaratik</Text>:
+      status === 'Connected' ? 
+      <ControllerPage sendCommand={sendCommand} />: 
+      null
       }
 
     </View>
