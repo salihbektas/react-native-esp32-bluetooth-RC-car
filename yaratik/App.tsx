@@ -4,6 +4,7 @@ import { Button, PermissionsAndroid, Platform, Pressable, StyleSheet, Text, View
 import { BleManager, Device } from 'react-native-ble-plx'
 import base64 from 'react-native-base64'
 import ControllerPage from './ControllerPage'
+import colors from './colors';
 
 
 type Status = 'Scanning' | 'Connecting' | 'Connected'
@@ -115,10 +116,10 @@ export default function App() {
   }, [])
 
   return (
-    <View style={styles.container}>
+    <View style={styles.main}>
       <StatusBar style="auto" />
-      {status === 'Scanning' ? <Text>Scanning</Text> : 
-      status === 'Connecting' ? <Text>Try to connect Yaratik</Text>:
+      {status === 'Scanning' ? <View style={styles.container}><Text>Scanning</Text></View> : 
+      status === 'Connecting' ? <View style={styles.container}><Text>Try to connect Yaratik</Text></View>:
       status === 'Connected' ? 
       <ControllerPage sendCommand={sendCommand} />: 
       null
@@ -129,17 +130,13 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+  main:{flex:1},
+
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  text: {
-    padding: 10,
-    margin: 15,
-    borderRadius: 8,
-    backgroundColor: 'lightblue'
-  }
 });
