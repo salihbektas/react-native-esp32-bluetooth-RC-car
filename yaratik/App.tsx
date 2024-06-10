@@ -15,28 +15,8 @@ export default function App() {
   const [status, setStatus] = useState<Status>('Scanning')
   const [device, setDevice] = useState<Device | null>(null)
 
-  function sendCommand(param:string) {
-    let command:string;
+  function sendCommand(command:string) {
 
-    switch(param){
-      case 'forward':
-        command = '1'
-        break;
-      case 'backward':
-        command = '2'
-        break;
-      case 'left':
-        command = '3'
-        break;
-      case 'right':
-        command = '4'
-        break;
-      default:
-        command = '0'
-        break;
-
-
-    }
     if(device){
       device.writeCharacteristicWithoutResponseForService(
         "4fafc201-1fb5-459e-8fcc-c5c9c331914b",

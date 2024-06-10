@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react';
 import {View, StyleSheet} from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
-import Animated, { clamp, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { clamp, runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import colors from './colors';
 
 
-export default function ControllerPage({sendCommand}:{sendCommand: (param:string)=>void}) {
+export default function ControllerPage({sendCommand}:{sendCommand: (command:string)=>void}) {
 
   const steeringOffset = useSharedValue<number>(0);
   const throttleOffset = useSharedValue<number>(0);
@@ -45,6 +45,49 @@ export default function ControllerPage({sendCommand}:{sendCommand: (param:string
     .onFinalize(() => {
       throttleOffset.value = withTiming(0, {duration: 100});
     });
+
+    useAnimatedReaction(
+    () => {
+      let mes
+      if (throttleOffset.value > 88) {
+        mes = 0
+      } else if (throttleOffset.value > 50) {
+        mes = 1
+      } else if (throttleOffset.value > 17) {
+        mes = 2
+      } else if (throttleOffset.value > -17) {
+        mes = 3
+      } else if (throttleOffset.value > -50) {
+        mes = 4
+      } else if (throttleOffset.value > -88) {
+        mes = 5
+      } else {
+        mes = 6
+      }
+
+      if (steeringOffset.value > 88) {
+        mes += 7 * 6
+      } else if (steeringOffset.value > 50) {
+        mes += 7 * 5
+      } else if (steeringOffset.value > 17) {
+        mes += 7 * 4
+      } else if (steeringOffset.value > -17) {
+        mes += 7 * 3
+      } else if (steeringOffset.value > -50) {
+        mes += 7 * 2
+      } else if (steeringOffset.value > -88) {
+        mes += 7
+      }
+
+      return mes
+    },
+    (result, previous) => {
+      if (result !== previous) {
+        runOnJS(sendCommand)(String(result))
+      }
+    },
+    []
+  )
     
 
     return(
