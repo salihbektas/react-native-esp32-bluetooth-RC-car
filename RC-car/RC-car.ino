@@ -42,6 +42,12 @@ class MyServerCallbacks : public BLEServerCallbacks
 
   void onDisconnect(BLEServer *pServer)
   {
+    digitalWrite(motor1Pin1, LOW);
+    digitalWrite(motor1Pin2, LOW);
+    digitalWrite(motor2Pin1, LOW);
+    digitalWrite(motor2Pin2, LOW);
+    ledcWrite(enable1Pin, 0);
+    ledcWrite(enable2Pin, 0);
     Serial.println("Disconnected");
   }
 };
@@ -66,9 +72,6 @@ class CharacteristicsCallbacks : public BLECharacteristicCallbacks
       leftIndex = throttle - steering;
       rightIndex = throttle + steering;
     }
-
-    Serial.println(leftIndex);
-    Serial.println(rightIndex);
 
     if(leftIndex < 0){
       leftIndex *= -1;
