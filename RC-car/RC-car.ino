@@ -32,16 +32,24 @@ int throttle, steering;
 
 int speed[4] = {0, 85, 170, 255};
 
+bool isConnected = false;
+bool isLedOn = false;
+unsigned long ledTime;
+
 
 class MyServerCallbacks : public BLEServerCallbacks
 {
   void onConnect(BLEServer *pServer)
   {
+    isConnected = true;
+    isLedOn = true;
+    digitalWrite(LED_BUILTIN, HIGH);
     Serial.println("Connected");
   };
 
   void onDisconnect(BLEServer *pServer)
   {
+    isConnected = false;
     digitalWrite(motor1Pin1, LOW);
     digitalWrite(motor1Pin2, LOW);
     digitalWrite(motor2Pin1, LOW);
@@ -124,6 +132,10 @@ void setup()
   ledcAttach(enable1Pin, freq, resolution);
   ledcAttach(enable2Pin, freq, resolution);
 
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  ledTime = millis();
+
   // Create the BLE Device
   BLEDevice::init("Yaratik");
   // Create the BLE Server
@@ -155,13 +167,17 @@ void setup()
 
 void loop()
 {
-  message_characteristic->setValue("Message one");
-  message_characteristic->notify();
+  if(!isConnected && millis() - ledTime > 1000){
 
-  delay(1000);
+    if(isLedOn){
+      digitalWrite(LED_BUILTIN, LOW);
+      isLedOn = false;
+    }
+    else{
+      digitalWrite(LED_BUILTIN, HIGH);
+      isLedOn = true;
+    }
+    ledTime = millis();
+  }
 
-  message_characteristic->setValue("Message Two");
-  message_characteristic->notify();
-
-  delay(1000);
 }
