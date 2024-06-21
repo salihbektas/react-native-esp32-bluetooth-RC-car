@@ -57,6 +57,7 @@ class MyServerCallbacks : public BLEServerCallbacks
     ledcWrite(enable1Pin, 0);
     ledcWrite(enable2Pin, 0);
     Serial.println("Disconnected");
+    pServer->getAdvertising()->start();
   }
 };
 
