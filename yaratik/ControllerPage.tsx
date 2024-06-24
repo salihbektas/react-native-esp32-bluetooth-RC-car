@@ -3,6 +3,7 @@ import {View, StyleSheet} from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { clamp, runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import colors from './colors';
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 
 export default function ControllerPage({sendCommand}:{sendCommand: (command:string)=>void}) {
@@ -88,6 +89,12 @@ export default function ControllerPage({sendCommand}:{sendCommand: (command:stri
     },
     []
   )
+
+  useMemo(() => {
+    (async() => {
+      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
+    })()
+  }, [])
     
 
     return(

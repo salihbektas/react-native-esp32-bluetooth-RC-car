@@ -33,6 +33,11 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      ["expo-screen-orientation",
+        {
+          "initialOrientation": "DEFAULT"
+        }
+      ],
       "react-native-ble-plx",
       "expo-router"
     ]

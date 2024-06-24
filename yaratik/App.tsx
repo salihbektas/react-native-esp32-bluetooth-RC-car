@@ -5,6 +5,7 @@ import { BleManager, Device } from 'react-native-ble-plx'
 import base64 from 'react-native-base64'
 import ControllerPage from './ControllerPage'
 import colors from './colors';
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 
 type Status = 'Scanning' | 'Connecting' | 'Connected'
@@ -88,6 +89,7 @@ export default function App() {
 
   useEffect(() => {
     (async() => {
+      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
       await requestBluetoothPermission()
     })()
 
