@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import { Button, PermissionsAndroid, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
-import { BleManager, Device } from 'react-native-ble-plx'
+import { Alert, Button, PermissionsAndroid, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { BleManager, Device, State } from 'react-native-ble-plx'
 import base64 from 'react-native-base64'
 import ControllerPage from './ControllerPage'
 import colors from './colors';
@@ -91,10 +91,31 @@ export default function App() {
     (async() => {
       await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
       await requestBluetoothPermission()
+      const subscription = manager.onStateChange((state) => {
+        if (state === 'PoweredOn') {
+          setStatus('Scanning')
+          scanAndConnect();
+          subscription.remove();
+        }
+    }, true);
+   
+      const btIsOpened = await manager.state() === State.PoweredOn
+      if(!btIsOpened){
+        Alert.alert('Bluetooth Must Be On', 'Do you want it to open?', Platform.OS === 'android' ?[
+          {
+            text: 'Turn On',
+            onPress: () => manager.enable().catch(error=> console.log('Try to bt turn on ', error))
+          }
+        ] : [{
+          text: 'Ok'
+        }]);
+      }
+      else{
+        setStatus('Scanning')
+        scanAndConnect()
+      }
     })()
 
-    setStatus('Scanning')
-    scanAndConnect()
   }, [])
 
   return (
