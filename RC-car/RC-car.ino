@@ -15,14 +15,13 @@ BLECharacteristic *message_characteristic = NULL;
 
 #define MESSAGE_CHARACTERISTIC_UUID "6d68efe5-04b6-4a85-abc4-c2670b7bf7fd"
 
+int motor1Pin1 = 12;
+int motor1Pin2 = 13;
+int enable1Pin = 5;
 
-int motor1Pin1 = 14; 
-int motor1Pin2 = 27; 
-int enable1Pin = 16; 
-
-int motor2Pin1 = 12; 
-int motor2Pin2 = 13; 
-int enable2Pin = 5;
+int motor2Pin1 = 14; 
+int motor2Pin2 = 27; 
+int enable2Pin = 16;
 
 // Setting PWM properties
 const int freq = 30000;
@@ -67,7 +66,7 @@ class CharacteristicsCallbacks : public BLECharacteristicCallbacks
   {
     Serial.print("Value Written ");
     int data = atoi(pCharacteristic->getValue().c_str());
-    Serial.println(data);
+    
     throttle = (data % 7) -3;
     steering = (data / 7) -3;
 
@@ -84,22 +83,22 @@ class CharacteristicsCallbacks : public BLECharacteristicCallbacks
 
     if(leftIndex < 0){
       leftIndex *= -1;
-      digitalWrite(motor1Pin1, LOW);
-      digitalWrite(motor1Pin2, HIGH);
-    }
-    else{
       digitalWrite(motor1Pin1, HIGH);
       digitalWrite(motor1Pin2, LOW);
+    }
+    else{
+      digitalWrite(motor1Pin1, LOW);
+      digitalWrite(motor1Pin2, HIGH);
     }
       
     if(rightIndex < 0){
       rightIndex *= -1;
-      digitalWrite(motor2Pin2, LOW);
-      digitalWrite(motor2Pin1, HIGH);
-    }
-    else{
       digitalWrite(motor2Pin2, HIGH);
       digitalWrite(motor2Pin1, LOW);
+    }
+    else{
+      digitalWrite(motor2Pin2, LOW);
+      digitalWrite(motor2Pin1, HIGH);
     }
 
     if(leftIndex < 0)
