@@ -3,6 +3,7 @@ import { PermissionsAndroid, Platform } from "react-native";
 import base64 from "react-native-base64";
 import { BleManager, Device } from "react-native-ble-plx";
 
+type Status = 'initial' | 'scanning' | 'connecting' | 'connected' | 'timeout'
 
 interface BluetoothLowEnergyApi {
   requestBluetoothPermission(): Promise<boolean>;
@@ -12,12 +13,14 @@ interface BluetoothLowEnergyApi {
   connectedDevice: Device | null;
   allDevices: Device[];
   manager: BleManager;
+  status : Status;
 }
 
 function useBLE(): BluetoothLowEnergyApi {
   const bleManager = useMemo(() => new BleManager(), []);
   const [allDevices, setAllDevices] = useState<Device[]>([]);
   const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
+  const [status, setStatus] = useState<Status>('initial')
 
 
   const requestBluetoothPermission = async () => {
@@ -54,18 +57,25 @@ function useBLE(): BluetoothLowEnergyApi {
     devices.findIndex((device) => nextDevice.id === device.id) > -1;
   
   function scanAndConnect(){
-    const timeout = setTimeout(() => {bleManager.stopDeviceScan()},5000)
+    const timeout = setTimeout(() => {
+      bleManager.stopDeviceScan()
+      setStatus('timeout')
+    },8000)
+
+    setStatus('scanning')
     bleManager.startDeviceScan(null, null, (error, device) => {
       if (error) {
-        console.log(error);
+        console.log('Device scan error: ', error);
       }
       if (device) {
         if(device.name === 'Yaratik'){
+          setStatus('connecting')
           clearTimeout(timeout)
           bleManager.stopDeviceScan()
           device.connect()
             .then(() => {
               setConnectedDevice(device)
+              setStatus('connected')
               device.discoverAllServicesAndCharacteristics()
                 .catch(error => console.log('Sevice discovery error: ', error))
             })
@@ -73,13 +83,15 @@ function useBLE(): BluetoothLowEnergyApi {
           console.log('found')
         } 
         else{
-          setAllDevices((prevState: Device[]) => {
-          if (!isDuplicteDevice(prevState, device)) {
-            return [...prevState, device];
+          if(device.name){
+            setAllDevices((prevState: Device[]) => {
+            if (!isDuplicteDevice(prevState, device)) {
+              return [...prevState, device];
+            }
+            return prevState;
+            });
           }
-          return prevState;
-        });
-      }
+        }
       }
     })};
 
@@ -97,7 +109,7 @@ function useBLE(): BluetoothLowEnergyApi {
           "4fafc201-1fb5-459e-8fcc-c5c9c331914b",
           "6d68efe5-04b6-4a85-abc4-c2670b7bf7fd",
           base64.encode(command)
-        ).catch(error => console.log(error))
+        ).catch(error => console.log('Write error: ', error))
       }
     }
   
@@ -108,7 +120,8 @@ function useBLE(): BluetoothLowEnergyApi {
     connectedDevice,
     disconnectFromDevice,
     manager: bleManager,
-    sendCommand
+    sendCommand,
+    status
   };
 }
 

@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState } from 'react';
-import { Alert, Platform, StyleSheet, Text, View } from 'react-native';
+import { Fragment, useEffect, useState } from 'react';
+import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { State } from 'react-native-ble-plx'
 import ControllerPage from './ControllerPage'
 import colors from './colors';
@@ -17,7 +17,8 @@ export default function App() {
     connectedDevice, 
     allDevices, 
     sendCommand,
-    disconnectFromDevice
+    disconnectFromDevice,
+    status
   } = useBLE()
 
   
@@ -60,23 +61,85 @@ export default function App() {
   return (
     <View style={styles.main}>
       <StatusBar style="auto" />
-      {
-        connectedDevice ? <ControllerPage sendCommand={sendCommand} />
-        :<View style={styles.container}><Text>Try to connect Yaratik</Text></View>
+      { status === 'initial' && <Text style={styles.infoText}> Checking Bluetooth </Text> }
+      { status === 'scanning' && <>
+        <Text style={styles.infoText}> Looking for Yaratik </Text>
+        <ActivityIndicator size={'large'} color={colors.water}/>
+        </>
       }
-
+      { status === 'connecting' && <>
+        <Text style={styles.infoText}> Try to connect Yaratik </Text>
+        <ActivityIndicator size={'large'} color={colors.water}/>
+        </>
+      }
+      { status === 'timeout' && <>
+        <Text style={styles.infoText}>Yaratik not found</Text>
+        {allDevices.length > 0 && <Text style={styles.auxiliaryText}>Founded devices:</Text> }
+        {allDevices.map((device, index) => {
+          console.log(device.name)
+          if(index !== 0){
+            return <Fragment key={index}>
+              <View style={styles.seperator} />
+              <Text style={styles.deviceNameText}>{device.name}</Text>
+            </Fragment>
+          }
+          return <Text key={index} style={styles.deviceNameText}>{device.name}</Text>
+        })}
+          <Pressable style={styles.button} onPress={scanAndConnect}>
+            <Text style={styles.buttonText}>Scan Again</Text>
+          </Pressable>
+        </>
+      }
+      { status === 'connected' && <ControllerPage sendCommand={sendCommand} /> }
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  main:{flex:1},
-
-  container: {
+  main:{
     flex: 1,
     backgroundColor: colors.white,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 16
   },
+
+  infoText: {
+    fontSize: 26,
+    fontWeight: '800',
+    color: colors.dark,
+    marginTop: 16
+  },
+
+  auxiliaryText: {
+    fontSize: 25,
+    fontWeight: '700',
+    color: colors.water,
+    marginVertical: 8
+  },
+
+  deviceNameText: {
+    fontSize: 24,
+    fontWeight: '600',
+    color: colors.dark
+  },
+
+  seperator: {
+    height: 2,
+    backgroundColor: colors.water,
+    borderRadius: 1
+  },
+
+  button: {
+    padding: 8,
+    alignItems: 'center',
+    marginTop: 'auto',
+    backgroundColor: colors.water,
+    borderRadius: 4
+  },
+
+  buttonText:{
+    color: colors.white,
+    fontSize: 20,
+    fontWeight: '500'
+  }
 
 });
