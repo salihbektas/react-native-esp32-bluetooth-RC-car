@@ -46,9 +46,6 @@ export default function App() {
           text: 'Ok'
         }]);
       }
-      else{
-        scanAndConnect()
-      }
 
       return () => {
         if(connectedDevice)
