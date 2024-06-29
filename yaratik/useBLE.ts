@@ -69,18 +69,19 @@ function useBLE(): BluetoothLowEnergyApi {
       }
       if (device) {
         if(device.name === 'Yaratik'){
-          setStatus('connecting')
           clearTimeout(timeout)
-          bleManager.stopDeviceScan()
-          device.connect()
-            .then(() => {
-              setConnectedDevice(device)
+          setStatus('connecting')
+          bleManager.stopDeviceScan();
+          (async () => {
+            try {
+              const connected = await device.connect()
+              const discovered = await connected.discoverAllServicesAndCharacteristics();
+              setConnectedDevice(discovered)
               setStatus('connected')
-              device.discoverAllServicesAndCharacteristics()
-                .catch(error => console.log('Sevice discovery error: ', error))
-            })
-            .catch((error) => {console.log('Not connected !!! ', error)})
-          console.log('found')
+            } catch (error) {
+              console.log('Sevice discovery or connection error: ', error);
+            }
+          })()
         } 
         else{
           if(device.name){
