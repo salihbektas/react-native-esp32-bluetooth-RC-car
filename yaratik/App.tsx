@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { State } from 'react-native-ble-plx'
 import ControllerPage from './ControllerPage'
@@ -20,6 +20,15 @@ export default function App() {
     disconnectFromDevice,
     status
   } = useBLE()
+
+
+  const infoText = useMemo<Record<string, string>>(() => ({
+    initial: 'Checking Bluetooth', 
+    scanning: 'Looking for Yaratik',
+    connecting: 'Try to connect Yaratik',
+    timeout: 'Yaratik not found',
+    failed: 'Failed to connect to Yaratik'
+  }),[])
 
   
 
@@ -58,19 +67,13 @@ export default function App() {
   return (
     <View style={styles.main}>
       <StatusBar style="auto" />
-      { status === 'initial' && <Text style={styles.infoText}> Checking Bluetooth </Text> }
-      { status === 'scanning' && <>
-        <Text style={styles.infoText}> Looking for Yaratik </Text>
+      <Text style={styles.infoText}> {infoText[status]} </Text>
+      
+      { status === 'scanning' || status === 'connecting' &&
         <ActivityIndicator size={'large'} color={colors.water}/>
-        </>
       }
-      { status === 'connecting' && <>
-        <Text style={styles.infoText}> Try to connect Yaratik </Text>
-        <ActivityIndicator size={'large'} color={colors.water}/>
-        </>
-      }
+
       { status === 'timeout' && <>
-        <Text style={styles.infoText}>Yaratik not found</Text>
         {allDevices.length > 0 && <Text style={styles.auxiliaryText}>Founded devices:</Text> }
         {allDevices.map((device, index) => {
           console.log(device.name)
@@ -87,8 +90,8 @@ export default function App() {
           </Pressable>
         </>
       }
+
       { status === 'failed' && <>
-          <Text style={styles.infoText}>Failed to connect to Yaratik</Text>
           <Pressable style={styles.button} onPress={scanAndConnect}>
             <Text style={styles.buttonText}>Connect Again</Text>
           </Pressable>
