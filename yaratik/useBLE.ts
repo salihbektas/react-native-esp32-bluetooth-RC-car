@@ -3,7 +3,7 @@ import { PermissionsAndroid, Platform } from "react-native";
 import base64 from "react-native-base64";
 import { BleManager, Device } from "react-native-ble-plx";
 
-type Status = 'initial' | 'scanning' | 'connecting' | 'connected' | 'timeout'
+type Status = 'initial' | 'scanning' | 'connecting' | 'connected' | 'timeout' | 'failed'
 
 interface BluetoothLowEnergyApi {
   requestBluetoothPermission(): Promise<boolean>;
@@ -80,6 +80,7 @@ function useBLE(): BluetoothLowEnergyApi {
               setStatus('connected')
             } catch (error) {
               console.log('Sevice discovery or connection error: ', error);
+              setStatus('failed')
             }
           })()
         } 

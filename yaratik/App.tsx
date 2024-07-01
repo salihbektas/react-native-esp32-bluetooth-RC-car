@@ -87,6 +87,13 @@ export default function App() {
           </Pressable>
         </>
       }
+      { status === 'failed' && <>
+          <Text style={styles.infoText}>Failed to connect to Yaratik</Text>
+          <Pressable style={styles.button} onPress={scanAndConnect}>
+            <Text style={styles.buttonText}>Connect Again</Text>
+          </Pressable>
+        </>
+      }
       { status === 'connected' && <ControllerPage sendCommand={sendCommand} /> }
     </View>
   );
