@@ -1,11 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import { Fragment, useEffect, useMemo, useState } from 'react';
+import { Fragment, useCallback, useEffect, useMemo } from 'react';
 import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { State } from 'react-native-ble-plx'
-import ControllerPage from './ControllerPage'
-import colors from './colors';
+import colors from '../colors';
 import * as ScreenOrientation from 'expo-screen-orientation';
-import useBLE from './useBLE';
+import useBLE from '../useBLE';
+import { router, useFocusEffect } from 'expo-router';
 
 
 export default function App() {
@@ -30,12 +30,18 @@ export default function App() {
     failed: 'Failed to connect to Yaratik'
   }),[])
 
-  
+  useEffect(() => {
+    if(status === 'connected')
+      router.navigate({pathname: 'ControllerPage', params:{sendCommand: sendCommand}})
+  }, [status])
+
+  useFocusEffect(useCallback(() => {
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+  }, []))
 
 
   useEffect(() => {
     (async() => {
-      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
       await requestBluetoothPermission()
       const subscription = manager.onStateChange((state) => {
         if (state === 'PoweredOn') {
@@ -97,7 +103,6 @@ export default function App() {
           </Pressable>
         </>
       }
-      { status === 'connected' && <ControllerPage sendCommand={sendCommand} /> }
     </View>
   );
 }

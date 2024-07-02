@@ -5,6 +5,9 @@ import { BleManager, Device } from "react-native-ble-plx";
 
 type Status = 'initial' | 'scanning' | 'connecting' | 'connected' | 'timeout' | 'failed'
 
+const bleManager = new BleManager();
+let connectedDevice: Device | null = null;
+
 interface BluetoothLowEnergyApi {
   requestBluetoothPermission(): Promise<boolean>;
   scanAndConnect(): void;
@@ -17,11 +20,9 @@ interface BluetoothLowEnergyApi {
 }
 
 function useBLE(): BluetoothLowEnergyApi {
-  const bleManager = useMemo(() => new BleManager(), []);
+ 
   const [allDevices, setAllDevices] = useState<Device[]>([]);
-  const [connectedDevice, setConnectedDevice] = useState<Device | null>(null);
   const [status, setStatus] = useState<Status>('initial')
-
 
   const requestBluetoothPermission = async () => {
     if (Platform.OS === 'ios') {
@@ -76,7 +77,7 @@ function useBLE(): BluetoothLowEnergyApi {
             try {
               const connected = await device.connect()
               const discovered = await connected.discoverAllServicesAndCharacteristics();
-              setConnectedDevice(discovered)
+              connectedDevice = discovered
               setStatus('connected')
             } catch (error) {
               console.log('Sevice discovery or connection error: ', error);
@@ -100,7 +101,7 @@ function useBLE(): BluetoothLowEnergyApi {
     function disconnectFromDevice(){
       if (connectedDevice) {
         bleManager.cancelDeviceConnection(connectedDevice.id);
-        setConnectedDevice(null);
+        connectedDevice = null;
       }
     };
 

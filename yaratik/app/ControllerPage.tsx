@@ -1,13 +1,16 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import {View, StyleSheet} from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { clamp, runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import colors from './colors';
+import colors from '../colors';
 import * as ScreenOrientation from 'expo-screen-orientation';
+import { useFocusEffect } from 'expo-router';
+import useBLE from '../useBLE';
 
 
-export default function ControllerPage({sendCommand}:{sendCommand: (command:string)=>void}) {
+export default function ControllerPage() {
 
+  const {sendCommand} = useBLE();
   const steeringOffset = useSharedValue<number>(0);
   const throttleOffset = useSharedValue<number>(0);
 
@@ -90,11 +93,9 @@ export default function ControllerPage({sendCommand}:{sendCommand: (command:stri
     []
   )
 
-  useMemo(() => {
-    (async() => {
-      await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
-    })()
-  }, [])
+  useFocusEffect(useCallback(() => {
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT);
+  }, []))
     
 
     return(
