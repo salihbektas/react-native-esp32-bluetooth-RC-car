@@ -29,7 +29,7 @@ const int resolution = 8;
 
 int throttle, steering;
 
-int speed[4] = {0, 85, 170, 255};
+int speed[4] = {0, 160, 205, 255};
 
 bool isConnected = false;
 bool isLedOn = false;
