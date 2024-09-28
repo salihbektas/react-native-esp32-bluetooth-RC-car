@@ -4,7 +4,7 @@
 
 # Yaratık
 
-Yaratık (beast in Turkish) is a remote control toy car project that works over bluetooth using react native expo and esp-32.
+Yaratık (creature in Turkish) is a remote control toy car project that works over bluetooth using react native expo and esp-32.
 
 ## Required parts list
 
@@ -38,3 +38,7 @@ For more detailed information:
 ## Circuit Diagram
 
 ![Circuit Diagram](/yaratik/assets/diagram.png)
+
+## Photograph
+
+![Yaratık](/yaratik/assets/yaratık.jpg)
