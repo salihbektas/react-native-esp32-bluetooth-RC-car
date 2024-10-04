@@ -12,7 +12,7 @@ Yaratık (creature in Turkish) is a remote control toy car project that works ov
 
 [L298N Motor Drive Controller](https://www.amazon.com/Qunqi-Controller-Module-Stepper-Arduino/dp/B014KMHSW6/ref=sr_1_7?crid=179K8ERLOZ22Z&keywords=L298N&qid=1678993275&sprefix=l298n%2Caps%2C204&sr=8-7)
 
-[Car Chassis Kit](https://www.amazon.com/YIKESHU-Smart-Chassis-Encoder-Battery/dp/B075LD4FPN/ref=sr_1_31_sspa?keywords=car+chassis&qid=1678993174&sprefix=car+chas%2Caps%2C203&sr=8-31-spons&psc=1&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUEzUVJFNFdaMFhESkgmZW5jcnlwdGVkSWQ9QTA1MjQyMzNHSDQ0S0I2R1RUNVcmZW5jcnlwdGVkQWRJZD1BMDE0MzIwNENVTEFFNEQyNjFHNSZ3aWRnZXROYW1lPXNwX210ZiZhY3Rpb249Y2xpY2tSZWRpcmVjdCZkb05vdExvZ0NsaWNrPXRydWU=) (including motors, wheels, battery box)
+[Car Chassis Kit](https://www.amazon.com/YIKESHU-Smart-Chassis-Encoder-Battery/dp/B075LD4FPN/ref=sr_1_31_sspa?keywords=car+chassis&qid=1678993174&sprefix=car+chas%2Caps%2C203&sr=8-31-spons&psc=1&spLa=ZW5jcnlwdGVkUXVhbGlmaWVyPUEzUVJFNFdaMFhESkgmZW5jcnlwdGVkSWQ9QTA1MjQyMzNHSDQ0S0I2R1RUNVcmZW5jcnlwdGVkQWRJZD1BMDE0MzIwNENVTEFFNEQyNjFHNSZ3aWRnZXROYW1lPXNwX210ZiZhY3Rpb249Y2xpY2tSZWRpcmVjdCZkb05vdExvZ0NsaWNrPXRydWU=) (including motors, wheels)
 
 [9-Volt Battery](https://www.amazon.com/Eveready-Heavy-1222BP-9-Volt-Battery/dp/B00004YK3J/ref=sr_1_29?keywords=9v+batteries&qid=1678993634&sprefix=9v+bat%2Caps%2C213&sr=8-29)
 
@@ -28,7 +28,7 @@ run:
 
 ```
 >npm i
->npx expo start
+>npx expo run:android
 ```
 
 For more detailed information:
@@ -42,3 +42,7 @@ For more detailed information:
 ## Photograph
 
 ![Yaratık](/yaratik/assets/yaratık.jpg)
+
+## Video
+
+https://github.com/user-attachments/assets/4f1630d6-d9e8-458a-a2fa-44d42532aa0f
